@@ -1,7 +1,9 @@
 const mongoose = require('mongoose')
-const bcrypt = require('bcryptjs')
 
 const customerSchema = new mongoose.Schema({
+    id: {
+        type: String,
+    },
     name:{
         type: String,
         required: true
@@ -32,24 +34,10 @@ const customerSchema = new mongoose.Schema({
         required: true,
         default: 'customer'
       },
-    
-
-})
-//hash the password before savind the data to MoonogDB
-customerSchema.pre('save',async function(next){
-    try{
-        if(!this.isModified('password')){
-            next()
-        }
-        else{
-            const saltRound = await bcrypt.saltRound(10)
-            const hashed_password =await bcrypt.hash(this.password,process.env.SECRET_KEY)
-            this.password = hashed_password
-        }
-    }
-    catch(err){
-        next(err)
-    }
+      isVerified: {
+        type: Boolean,
+        default: false
+      }
 })
 
 const Customer  = new mongoose.model('customer',customerSchema)
