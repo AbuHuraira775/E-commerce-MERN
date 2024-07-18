@@ -4,41 +4,45 @@ const customerSchema = new mongoose.Schema({
     id: {
         type: String,
     },
-    name:{
+    name: {
         type: String,
         required: true
     },
-    email:{
+    email: {
         type: String,
         required: true
     },
-    password:{
+    password: {
         type: String,
         required: true
     },
-    address:{
+    address: {
         type: Object,
-        properties:{
+        properties: {
             street: "String",
-            state:"String",
+            state: "String",
             city: "String"
         },
         required: true
     },
-    phone:{
+    phone: {
         type: String,
-        required: true 
+        required: true
     },
     type: {
         type: String,
         required: true,
         default: 'customer'
-      },
-      isVerified: {
+    },
+    isVerified: {
         type: Boolean,
         default: false
-      }
+    },
+    otp: {
+        type: String,
+        required: true,
+    }
 })
 
-const Customer  = new mongoose.model('customer',customerSchema)
+const Customer = new mongoose.model('customer', customerSchema)
 module.exports = Customer
