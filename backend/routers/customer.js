@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const customerAuthController = require('../controllers/customer/auth-controller')
 const verifyToken = require('../utils/verify-token')
-
+const {verifyAuthToken} = require('../middleware/authVerify')
 
 // GET METHODS 
 router.route('/').get(customerAuthController.home)
@@ -13,9 +13,10 @@ router.route('/wishlists').get(customerAuthController.wishlists)
 
 // POST METHODS 
 router.route('/register').post(customerAuthController.register)
+// router.post('/register',customerAuthController.register)
 router.route('/verify-account').post(customerAuthController.verifyAccount)
 router.route('/login').post(customerAuthController.login)
-router.route('/change-password').post(customerAuthController.changePassword)
+router.route('/change-password').post(verifyAuthToken,customerAuthController.changePassword)
 
 // PUT METHODS 
 router.route('/updateName').put(customerAuthController.updateName)

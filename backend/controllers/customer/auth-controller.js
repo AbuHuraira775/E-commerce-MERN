@@ -114,7 +114,7 @@ const verifyAccount = async (req, res) => {
             }
             else {
                 console.log(existEmail)
-                return res.status(400).json({ state: false, msg: `OTP is not correct`, data: existEmail })
+                return res.status(400).json({ state: false, msg: `OTP is not correct` })
             }
         }
         else {
@@ -180,7 +180,7 @@ const login = async (req, res) => {
 
 const changePassword = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password,newPass,newConfPass } = req.body;
 
         const existEmail = await Customer.findOne({ email })
 
@@ -190,16 +190,21 @@ const changePassword = async (req, res) => {
             const result = await comaprePassword(password, existEmail.password)
             // if both are same return true
             if (result) {
-                return res.status(400).json({ state: false, msg: `Password should not be same` })
+                if(newPass == newConfPass){
+                    const hashed_password = await hashPassword(newPass)
+                    existEmail.password = hashed_password
+                    
+                    // save to DB 
+                    await existEmail.save()
+                    return res.status(200).json({ state: true, msg: `Password is updated successfully`, data: hashed_password })
+                }
+                else{
+                    return res.status(400).json({ state: false, msg: `New and Confirm Password did not matched!` })                    
+                }
             }
             else {
+                return res.status(400).json({ state: false, msg: `Incorrect Password` })
                 // hash the new password and than save 
-                const hashed_password = await hashPassword(password)
-                existEmail.password = hashed_password
-
-                // save to DB 
-                await existEmail.save()
-                return res.status(200).json({ state: true, msg: `Password is updated successfully`, data: hashed_password })
 
             }
         }
