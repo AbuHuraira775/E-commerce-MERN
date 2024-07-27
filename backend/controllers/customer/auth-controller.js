@@ -54,6 +54,7 @@ const wishlists = (req, res) => {
 // POST METHODS 
 const register = async (req, res) => {
 
+    console.log('running')
     try {
         //fetch data from the body
         const { name, email, password, phone, address, type } = req.body;
