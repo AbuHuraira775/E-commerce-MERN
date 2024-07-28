@@ -17,6 +17,10 @@ router.route('/register').post(customerAuthController.register)
 router.route('/verify-account').post(customerAuthController.verifyAccount)
 router.route('/login').post(customerAuthController.login)
 router.route('/change-password').post(customerAuthController.changePassword)
+router.route('/add-cart').post(customerAuthController.addCart)
+router.route('/add-whishlist').post(customerAuthController.addWhishlist)
+router.route('/add-review').post(customerAuthController.addReview)
+router.route('/add-order').post(customerAuthController.addOrder)
 
 // PUT METHODS 
 router.route('/updateName').put(customerAuthController.updateName)

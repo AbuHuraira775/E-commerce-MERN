@@ -199,17 +199,17 @@ const changePassword = async (req, res) => {
                     // compare regex password pattern 
                     const regexPassword = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
                     if (regexPassword.test(newPass)) {
-                        console.log('If Regex : ' ,regexPassword.test(newPass))
+                        console.log('If Regex : ', regexPassword.test(newPass))
                         const hashed_password = await hashPassword(newPass)
                         existEmail.password = hashed_password;
                         existEmail.token = token;
 
                         // save to DB 
                         await existEmail.save()
-                        return res.status(200).json({ state: true, msg: `Password is updated successfully`})
+                        return res.status(200).json({ state: true, msg: `Password is updated successfully` })
                     }
                     else {
-                        console.log('Else Regex : ' ,regexPassword.test(newPass))
+                        console.log('Else Regex : ', regexPassword.test(newPass))
 
                         res.status(400).json({ state: false, msg: `password is not valid` })
                     }
@@ -228,6 +228,47 @@ const changePassword = async (req, res) => {
 
         }
     } catch (error) {
+        console.error(error)
+    }
+}
+
+
+
+const addCart = async (req, res) => {
+    try {
+        return res.status(200).json({ state: true, msg: `Add cart page is here` })
+    }
+    catch (error) {
+        console.error(error)
+    }
+}
+
+
+const addOrder = async (req, res) => {
+    try {
+        return res.status(200).json({ state: true, msg: `Add Order page is here` })
+    }
+    catch (error) {
+        console.error(error)
+    }
+}
+
+
+const addReview = async (req, res) => {
+    try {
+        return res.status(200).json({ state: true, msg: `Add Review page is here` })
+    }
+    catch (error) {
+        console.error(error)
+    }
+}
+
+
+const addWhishlist = async (req, res) => {
+    try {
+        return res.status(200).json({ state: true, msg: `Add Whishlist page is here` })
+    }
+    catch (error) {
         console.error(error)
     }
 }
@@ -356,6 +397,10 @@ module.exports = {
     profile,
     updateName,
     changePassword,
+    addCart,
+    addOrder,
+    addReview,
+    addWhishlist,
     orders,
     reviews,
     wishlists,
