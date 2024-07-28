@@ -2,10 +2,6 @@ const mongoose = require('mongoose')
 
 const orderSchema = new mongoose.Schema({
 
-    orderId: {
-        type: String,
-        // required: true
-    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -20,10 +16,6 @@ const orderSchema = new mongoose.Schema({
         type: Date,
         default: Date.now()
     },
-    price: {
-        type: Number,
-        required: true
-    },
     quantity: {
         type: Number,
         required: true
@@ -36,7 +28,10 @@ const orderSchema = new mongoose.Schema({
             city: "String"
         }
     },
-})
+},
+    { timestamps: true }
+
+)
 
 const Order = new mongoose.model('Order', orderSchema)
 module.exports = Order
