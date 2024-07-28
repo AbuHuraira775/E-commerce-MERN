@@ -259,7 +259,7 @@ const changePassword = async (req, res) => {
 
 const addCart = async (req, res) => {
     try {
-        const { email, userId, id, title, price, description, category, quantity } = req.body;
+        const { email, userId, productId, quantity } = req.body;
         const existEmail = await Customer.findOne({ email })
         if (!existEmail) {
             return res.status(400).json({
@@ -268,7 +268,7 @@ const addCart = async (req, res) => {
             })
         }
         else {
-            await Cart.create({ userId, id, title, description, price, category, quantity })
+            await Cart.create({ userId, productId, quantity })
             return res.status(200).json({
                 state: true,
                 msg: `Items have been added to cart succesfully`
