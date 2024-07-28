@@ -61,6 +61,10 @@ const register = async (req, res) => {
 
         //generate OTP 
         const otp = generate_OPT()
+
+        // create the token 
+        const token = await createToken(email, type)
+
         const customerData = {
             name,
             email,
@@ -68,7 +72,8 @@ const register = async (req, res) => {
             phone,
             address,
             type,
-            otp
+            otp,
+            token
         }
 
         //check email exits  or not?
@@ -146,8 +151,8 @@ const login = async (req, res) => {
                 const type = await existEmail.type
                 const token = await createToken(email, type)
 
-                // save token to the local storage 
-                // const userToken = localStorage.setItem('userTokens',token)
+                // save token to the DB
+                await existEmail.save()
 
                 return res.status(200).json({
                     state: true,
@@ -180,7 +185,7 @@ const login = async (req, res) => {
 
 const changePassword = async (req, res) => {
     try {
-        const { email, password,newPass,newConfPass } = req.body;
+        const { email, password, newPass, newConfPass } = req.body;
 
         const existEmail = await Customer.findOne({ email })
 
@@ -190,16 +195,27 @@ const changePassword = async (req, res) => {
             const result = await comaprePassword(password, existEmail.password)
             // if both are same return true
             if (result) {
-                if(newPass == newConfPass){
-                    const hashed_password = await hashPassword(newPass)
-                    existEmail.password = hashed_password
-                    
-                    // save to DB 
-                    await existEmail.save()
-                    return res.status(200).json({ state: true, msg: `Password is updated successfully`, data: hashed_password })
+                if (newPass == newConfPass) {
+                    // compare regex password pattern 
+                    const regexPassword = /^(?=.*[a-z])(?=\d*[0-9])[a-z0-9]{8,}$/;
+                    // if (regexPassword.test(newPass)) {
+                        if (true) {
+                        console.log('If Regex : ' ,regexPassword.test(newPass))
+                        // const hashed_password = await hashPassword(newPass)
+                        // existEmail.password = hashed_password
+
+                        // save to DB 
+                        // await existEmail.save()
+                        return res.status(200).json({ state: true, msg: `Password is updated successfully`})
+                    }
+                    else {
+                        console.log('Else Regex : ' ,regexPassword.test(newPass))
+
+                        res.status(400).json({ state: false, msg: `password is not valid` })
+                    }
                 }
-                else{
-                    return res.status(400).json({ state: false, msg: `New and Confirm Password did not matched!` })                    
+                else {
+                    return res.status(400).json({ state: false, msg: `New and Confirm Password did not matched!` })
                 }
             }
             else {
@@ -318,11 +334,11 @@ const review = (req, res) => {
 }
 
 
-const getAllUsers = async(req, res) => {
+const getAllUsers = async (req, res) => {
     try {
         const allUsers = await Customer.find()
         res.status(200).json({
-            state: true, 
+            state: true,
             msg: `All users are fetched from the DM succesfully`,
             data: allUsers
         })

@@ -16,7 +16,7 @@ router.route('/register').post(customerAuthController.register)
 // router.post('/register',customerAuthController.register)
 router.route('/verify-account').post(customerAuthController.verifyAccount)
 router.route('/login').post(customerAuthController.login)
-router.route('/change-password').post(verifyAuthToken,customerAuthController.changePassword)
+router.route('/change-password').post(customerAuthController.changePassword)
 
 // PUT METHODS 
 router.route('/updateName').put(customerAuthController.updateName)
