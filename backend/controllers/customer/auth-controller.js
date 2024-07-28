@@ -198,14 +198,13 @@ const changePassword = async (req, res) => {
                 if (newPass == newConfPass) {
                     // compare regex password pattern 
                     const regexPassword = /^(?=.*[a-z])(?=\d*[0-9])[a-z0-9]{8,}$/;
-                    // if (regexPassword.test(newPass)) {
-                        if (true) {
+                    if (regexPassword.test(newPass)) {
                         console.log('If Regex : ' ,regexPassword.test(newPass))
-                        // const hashed_password = await hashPassword(newPass)
-                        // existEmail.password = hashed_password
+                        const hashed_password = await hashPassword(newPass)
+                        existEmail.password = hashed_password
 
                         // save to DB 
-                        // await existEmail.save()
+                        await existEmail.save()
                         return res.status(200).json({ state: true, msg: `Password is updated successfully`})
                     }
                     else {
