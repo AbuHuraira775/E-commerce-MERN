@@ -21,9 +21,6 @@ router.route('/product').post(vendorAuthController.addProduct)
 router.route('/order').post(vendorAuthController.addOrder)
 router.route('/review').post(vendorAuthController.addReview)
 router.route('/shop-detail').post(vendorAuthController.addShopDetail)
-
-// PUT METHODS 
-router.route('/profile').put(vendorAuthController.updateProfile)
 router.route('/product/:id').put(vendorAuthController.editProduct)
 router.route('/order/:id').put(vendorAuthController.editOrder)
 router.route('/review/:id').put(vendorAuthController.editreview)
