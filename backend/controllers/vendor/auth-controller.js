@@ -130,7 +130,8 @@ const resetPassword = async(req,res)=>{
 
 const addProduct = async(req,res)=>{
     try {
-        res.status(200).json({state:true,
+        res.status(200).json({
+            state:true,
             msg: `VENDOR POST METHOD: addProduct page is rendered`
         })
     } 
