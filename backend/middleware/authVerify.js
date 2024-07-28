@@ -4,7 +4,7 @@ var ObjectId = require('mongodb').ObjectId;
 
 
 const verifyAuthToken =async(req,res,next)=>{
-    const {email,id,tkn,userType}= req.body;
+    const {email,id,token,userType}= req.body;
     //  AuthModel.findById(id)
     var o_id = new ObjectId(id);
     const existId = await Customer.find({ '_id':o_id })
@@ -14,7 +14,7 @@ const verifyAuthToken =async(req,res,next)=>{
         if(!existId.isVerified)
             return res.status(401).send({state:"failure",message:"Currently your account is not verified, Kindly contact to service center."})
         else {
-            jwt.verify(tkn,process.env.SECRET_KEY,(err,decode)=>{
+            jwt.verify(token,process.env.SECRET_KEY,(err,decode)=>{
             if(err){
                 return res.status(401).send({message:"unauthorized person 2",state:"failure"})
             }

@@ -185,7 +185,7 @@ const login = async (req, res) => {
 
 const changePassword = async (req, res) => {
     try {
-        const { email, password, newPass, newConfPass } = req.body;
+        const { email, password, newPass, newConfPass,token } = req.body;
 
         const existEmail = await Customer.findOne({ email })
 
@@ -195,13 +195,14 @@ const changePassword = async (req, res) => {
             const result = await comaprePassword(password, existEmail.password)
             // if both are same return true
             if (result) {
-                if (newPass == newConfPass) {
+                if (password == newPass || newPass == newConfPass) {
                     // compare regex password pattern 
-                    const regexPassword = /^(?=.*[a-z])(?=\d*[0-9])[a-z0-9]{8,}$/;
+                    const regexPassword = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
                     if (regexPassword.test(newPass)) {
                         console.log('If Regex : ', regexPassword.test(newPass))
                         const hashed_password = await hashPassword(newPass)
-                        existEmail.password = hashed_password
+                        existEmail.password = hashed_password;
+                        existEmail.token = token;
 
                         // save to DB 
                         await existEmail.save()
@@ -214,13 +215,12 @@ const changePassword = async (req, res) => {
                     }
                 }
                 else {
-                    return res.status(400).json({ state: false, msg: `New and Confirm Password did not matched!` })
+                    return res.status(400).json({ state: false, msg: `Old and New Password should not be same, Also New Password and Confirm Password did not matched!` })
                 }
             }
             else {
                 return res.status(400).json({ state: false, msg: `Incorrect Password` })
                 // hash the new password and than save 
-
             }
         }
         else {
