@@ -4,6 +4,10 @@ const hashPassword = require('../../utils/hash-password')
 const comaprePassword = require('../../utils/comapre-password')
 const generate_OPT = require('../../utils/generate-otp')
 const sendEmail = require('../../utils/send-mail')
+const Product = require('../../models/product/product-model')
+const Order = require('../../models/order/order-model')
+const Review = require('../../models/review/review-model')
+const Cart = require('../../models/cart/cart-model')
 
 
 // GET METHODS 
@@ -24,16 +28,36 @@ const profile = async (req, res) => {
     }
 }
 
-const orders = (req, res) => {
+const allOrders = async (req, res) => {
     try {
-        res.status(200).json({ state: true, msg: `User order page is rendered` })
+        const allOrders = await Order.find()
+        return res.status(200).json({
+            state: true,
+            msg: `All Orders fetched successfully`,
+            data: allOrders
+        })
     }
     catch (error) {
         console.error(`Error : ${error}`)
     }
 }
 
-const reviews = (req, res) => {
+const allProducts = async (req, res) => {
+    try {
+        const allProducts = await Product.find()
+        res.status(200).json({
+            state: true,
+            msg: `User allProducts page is rendered`,
+            data: allProducts
+        })
+    }
+    catch (error) {
+        console.error(`Error : ${error}`)
+    }
+}
+
+
+const allReviews = (req, res) => {
     try {
         res.status(200).json({ state: true, msg: `User review page is rendered` })
     }
@@ -42,7 +66,7 @@ const reviews = (req, res) => {
     }
 }
 
-const wishlists = (req, res) => {
+const allWishlists = (req, res) => {
     try {
         res.status(200).json({ state: true, msg: `User wishlist page is rendered` })
     }
@@ -54,7 +78,6 @@ const wishlists = (req, res) => {
 // POST METHODS 
 const register = async (req, res) => {
 
-    console.log('running')
     try {
         //fetch data from the body
         const { name, email, password, phone, address, type } = req.body;
@@ -185,7 +208,7 @@ const login = async (req, res) => {
 
 const changePassword = async (req, res) => {
     try {
-        const { email, password, newPass, newConfPass,token } = req.body;
+        const { email, password, newPass, newConfPass, token } = req.body;
 
         const existEmail = await Customer.findOne({ email })
 
@@ -236,27 +259,72 @@ const changePassword = async (req, res) => {
 
 const addCart = async (req, res) => {
     try {
-        return res.status(200).json({ state: true, msg: `Add cart page is here` })
+        const { email, userId, productId, quantity } = req.body;
+        const existEmail = await Customer.findOne({ email })
+        if (!existEmail) {
+            return res.status(400).json({
+                state: false,
+                msg: `You cannot Add items in cart. You have not created the account yet. Register your account first`
+            })
+        }
+        else {
+            await Cart.create({ userId, productId, quantity })
+            return res.status(200).json({
+                state: true,
+                msg: `Items have been added to cart succesfully`
+            })
+        }
     }
     catch (error) {
         console.error(error)
     }
 }
 
-
 const addOrder = async (req, res) => {
     try {
-        return res.status(200).json({ state: true, msg: `Add Order page is here` })
+        const { email, userId, productId, shippingAddress, orderDate, quantity } = req.body;
+
+        const existEmail = await Customer.findOne({ email })
+        if (!existEmail) {
+            return res.status(400).json({
+                state: false,
+                msg: `User Does not existed please login first`
+            })
+        }
+        else {
+            const newOrder = { quantity, shippingAddress, orderDate, email, userId, productId }
+            await Order.create(newOrder)
+            return res.status(200).json({
+                state: true,
+                msg: `Order has been created successfully`
+            })
+        }
     }
     catch (error) {
-        console.error(error)
+        console.error(`Error : ${error}`)
     }
 }
 
 
 const addReview = async (req, res) => {
     try {
-        return res.status(200).json({ state: true, msg: `Add Review page is here` })
+
+        const { email, productId, userId, content, date, rating } = req.body;
+
+        const existEmail = await Customer.find({ email })
+        if (!existEmail) {
+            return res.status(400).json({
+                state: false,
+                msg: `You cannot reviw in this product. You have not created the account yet. Register your account first`
+            })
+        }
+        else {
+            await Review.create({ email, productId, userId, content, date, rating })
+            return res.status(200).json({
+                state: true,
+                msg: `Your review has been added successfully`
+            })
+        }
     }
     catch (error) {
         console.error(error)
@@ -401,9 +469,10 @@ module.exports = {
     addOrder,
     addReview,
     addWhishlist,
-    orders,
-    reviews,
-    wishlists,
+    allOrders,
+    allProducts,
+    allReviews,
+    allWishlists,
     updateProfile,
     updateCart,
     updateReview,

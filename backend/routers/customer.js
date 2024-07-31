@@ -7,9 +7,10 @@ const {verifyAuthToken} = require('../middleware/authVerify')
 // GET METHODS 
 router.route('/').get(customerAuthController.home)
 router.route('/profile').get(customerAuthController.profile)
-router.route('/orders').get(customerAuthController.orders)
-router.route('/reviews').get(customerAuthController.reviews)
-router.route('/wishlists').get(customerAuthController.wishlists)
+router.route('/all-orders').get(customerAuthController.allOrders)
+router.route('/all-products').get(customerAuthController.allProducts)
+router.route('/all-reviews').get(customerAuthController.allReviews)
+router.route('/all-wishlists').get(customerAuthController.allWishlists)
 
 // POST METHODS 
 router.route('/register').post(customerAuthController.register)

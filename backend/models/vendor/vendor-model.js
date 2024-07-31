@@ -1,10 +1,6 @@
 const mongoose = require('mongoose')
 
 const vendorSchema = new mongoose.Schema({
-    id: {
-        type: String,
-        required: true
-    },
     name: {
         type: String,
         required: true
@@ -18,13 +14,8 @@ const vendorSchema = new mongoose.Schema({
         required: true
     },
     address: {
-        type: Object,
+        type: String,
         required: true,
-        properties: {
-            street: "String",
-            state: "String",
-            city: "String"
-        }
     },
     phone: {
         type: String,
@@ -32,19 +23,13 @@ const vendorSchema = new mongoose.Schema({
     },
     otp: {
         type: String,
-        required: true
     },
     shopeName: {
         type: String,
         required: true
     },
     shopeAddress: {
-        type: Object,
-        properties: {
-            street: "String",
-            state: "String",
-            city: "String"
-        },
+        type: String,
         required: true
     },
     type: {

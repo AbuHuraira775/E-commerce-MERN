@@ -23,14 +23,16 @@ const reviewSchema = new mongoose.Schema({
         default: Date.now(),
         required: true
     },
-    reting: {
+    rating: {
         type: Number,
         min: 1,
         max: 5,
         default: 3,
         required: true
     }
-})
+},
+    { timestamps: true }
+)
 
 const Review = new mongoose.model('Review', reviewSchema)
 module.exports = Review
