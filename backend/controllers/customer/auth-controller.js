@@ -8,12 +8,18 @@ const Product = require('../../models/product/product-model')
 const Order = require('../../models/order/order-model')
 const Review = require('../../models/review/review-model')
 const Cart = require('../../models/cart/cart-model')
+const Wishlist = require('../../models/wishlist/wishlist-model')
 
 
 // GET METHODS 
-const home = (req, res) => {
+const home = async (req, res) => {
     try {
-        res.status(200).json({ state: true, msg: `User home page is rendered` })
+        const allProducts = await Product.find()
+        res.status(200).json({
+            state: true,
+            msg: `User home page is rendered`,
+            data: allProducts
+        })
     }
     catch (error) {
         console.error(`Error : ${error}`)
@@ -22,8 +28,16 @@ const home = (req, res) => {
 
 const profile = async (req, res) => {
     try {
-        res.status(200).json({ state: true, msg: `Profile Page form the customer API` })
-    } catch (error) {
+        const { email } = req.body
+        const existEmail = await Customer.find({ email })
+
+        res.status(200).json({
+            state: true,
+            msg: `Profile Page form the customer API`,
+            data: existEmail
+        })
+    }
+    catch (error) {
         console.error(error)
     }
 }
@@ -57,23 +71,54 @@ const allProducts = async (req, res) => {
 }
 
 
-const allReviews = (req, res) => {
+const allReviews = async (req, res) => {
     try {
-        res.status(200).json({ state: true, msg: `User review page is rendered` })
+        const allReviews = await Review.find()
+        res.status(200).json({
+            state: true,
+            msg: `User review page is rendered`,
+            data: allReviews
+        })
     }
     catch (error) {
         console.error(`Error : ${error}`)
     }
 }
 
-const allWishlists = (req, res) => {
+const allWishlists = async (req, res) => {
     try {
-        res.status(200).json({ state: true, msg: `User wishlist page is rendered` })
+        const { email } = req.body;
+        const existEmail = await Customer.find({ email })
+        if (existEmail) {
+            const allWishlist = await Wishlist.find()
+            return res.status(200).json({ state: true, msg: `Your Wishlist items`, data: allWishlist })
+        }
+        else {
+            res.status(400).json({ state: false, msg: `You are not registered yet` })
+        }
     }
     catch (error) {
         console.error(`Error : ${error}`)
     }
 }
+
+const allCarts = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const existEmail = await Customer.find({ email })
+        if (existEmail) {
+            const allCarts = await Cart.find()
+            return res.status(200).json({ state: true, msg: `Your Cart items`, data: allCarts })
+        }
+        else {
+            res.status(400).json({ state: false, msg: `You are not registered yet` })
+        }
+    }
+    catch (error) {
+        console.error(`Error : ${error}`)
+    }
+}
+
 
 // POST METHODS 
 const register = async (req, res) => {
@@ -218,36 +263,57 @@ const changePassword = async (req, res) => {
             const result = await comaprePassword(password, existEmail.password)
             // if both are same return true
             if (result) {
-                if (password == newPass || newPass == newConfPass) {
-                    // compare regex password pattern 
-                    const regexPassword = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-                    if (regexPassword.test(newPass)) {
-                        console.log('If Regex : ', regexPassword.test(newPass))
-                        const hashed_password = await hashPassword(newPass)
-                        existEmail.password = hashed_password;
-                        existEmail.token = token;
-
-                        // save to DB 
-                        await existEmail.save()
-                        return res.status(200).json({ state: true, msg: `Password is updated successfully` })
-                    }
-                    else {
-                        console.log('Else Regex : ', regexPassword.test(newPass))
-
-                        res.status(400).json({ state: false, msg: `password is not valid` })
-                    }
+                if (password == newPass) {
+                    return res.status(400).json({
+                        state: false,
+                        msg: `Previous Password and new Password should not be same `
+                    })
                 }
                 else {
-                    return res.status(400).json({ state: false, msg: `Old and New Password should not be same, Also New Password and Confirm Password did not matched!` })
+
+                    if (newPass == newConfPass) {
+                        // compare regex password pattern 
+                        const regexPassword = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+                        if (regexPassword.test(newPass)) {
+                            const hashed_password = await hashPassword(newPass)
+                            existEmail.password = hashed_password;
+                            existEmail.token = token;
+
+                            // save to DB 
+                            await existEmail.save()
+                            return res.status(200).json({
+                                state: true,
+                                msg: `Password is updated successfully`
+
+                            })
+                        }
+                        else {
+                            res.status(400).json({
+                                state: false,
+                                msg: `password is not valid`
+                            })
+                        }
+                    }
+                    else {
+                        return res.status(400).json({
+                            state: false,
+                            msg: `New Password and Confirm Password did not matched!`
+                        })
+                    }
                 }
             }
             else {
-                return res.status(400).json({ state: false, msg: `Incorrect Password` })
-                // hash the new password and than save 
+                return res.status(400).json({
+                    state: false,
+                    msg: `Incorrect Password`
+                })
             }
         }
         else {
-            return res.status(400).json({ state: true, msg: `User does exist` })
+            return res.status(400).json({
+                state: false,
+                msg: `User does not exist`
+            })
 
         }
     } catch (error) {
@@ -255,7 +321,7 @@ const changePassword = async (req, res) => {
     }
 }
 
-
+// 
 
 const addCart = async (req, res) => {
     try {
@@ -332,9 +398,25 @@ const addReview = async (req, res) => {
 }
 
 
-const addWhishlist = async (req, res) => {
+const addWishlist = async (req, res) => {
     try {
-        return res.status(200).json({ state: true, msg: `Add Whishlist page is here` })
+        const { email, productId } = req.body;
+        const existEmail = await Customer.find({ email })
+        if (existEmail) {
+            const wishlistItem = await Wishlist.find({ email, productId })
+            if (wishlistItem.length >= 1) {
+                await Wishlist.deleteOne({ email, productId })
+                res.status(200).json({ state: true, msg: `Item removed from the wishlist`, data: wishlistItem })
+            }
+            else {
+                const newWishlistItem = new Wishlist({ email, productId });
+                await newWishlistItem.save();
+                res.status(200).json({ state: true, msg: `Item added to the wishlist`, data: wishlistItem })
+            }
+        }
+        else {
+            res.status(400).json({ state: false, msg: `You are not register. Create your account first` })
+        }
     }
     catch (error) {
         console.error(error)
@@ -355,23 +437,24 @@ const updateProfile = (req, res) => {
 const updateName = async (req, res) => {
     try {
         // get user updated data from the body
-        const { name, email, address, phone } = req.body;
-        const userData = { name, email, address, phone }
+        const { newName, email, newAddress, newPhone } = req.body;
 
         //check user exists or not?
         const existEmail = await Customer.findOne({ email })
 
         if (existEmail) {
-            if (!name.trim() == '' && !email.trim() == '' && !phone.trim() == '' && !address.trim() == '') {
+            if (!newName.trim() == '' && !newPhone.trim() == '' && !newAddress.trim() == '') {
 
-
-                // save to MongoDB  
-                await existEmail.save()
+                const updatedUser = await Customer.findOneAndUpdate({ email }, {
+                    name: newName,
+                    address: newAddress,
+                    phone: newPhone
+                })
 
                 return res.status(200).json({
                     state: true,
                     msg: `User Data updated successfully`,
-                    data: userUpdatedData
+                    data: updatedUser
                 })
             }
             else {
@@ -391,18 +474,59 @@ const updateName = async (req, res) => {
     }
 }
 
-const updateCart = (req, res) => {
+const updateCart = async (req, res) => {
     try {
-        res.status(200).json({ state: true, msg: `User updateCart page is rendered` })
+        const { email, userId, productId, newQuantity } = req.body;
+        const existEmail = await Customer.findOne({ email })
+        if (!existEmail) {
+            return res.status(400).json({
+                state: false,
+                msg: `You have not created the account yet. Register your account first`
+            })
+        }
+        else {
+            await Cart.findOneAndUpdate({ email, userId, productId },
+                { quantity: newQuantity }
+            )
+            return res.status(200).json({
+                state: true,
+                msg: `Your cart is updated succesfully`
+            })
+        }
     }
     catch (error) {
         console.error(`Error : ${error}`)
     }
 }
 
-const updateReview = (req, res) => {
+const updateReview = async (req, res) => {
     try {
-        res.status(200).json({ state: true, msg: `User updateReview page is rendered` })
+
+        const { email, productId, userId, newContent, newDate, newRating } = req.body;
+
+        const existEmail = await Customer.find({ email })
+        if (!existEmail) {
+            return res.status(400).json({
+                state: false,
+                msg: `You have not created the account yet. Register your account first`
+            })
+        }
+        else {
+            if (!newContent.trim() == '' && !newRating < 1) {
+                const updatedReview = await Review.findOneAndUpdate({ productId, userId },
+                    { content: newContent, date: newDate, rating: newRating }
+                )
+                return res.status(200).json({
+                    state: true,
+                    msg: `This review has been updated successfully`,
+                    date: updatedReview
+                })
+
+            }
+            else {
+                res.status(400).json({ state: false, msg: `Content must not be empty and rating should be at least 1` })
+            }
+        }
     }
     catch (error) {
         console.error(`Error : ${error}`)
@@ -412,9 +536,31 @@ const updateReview = (req, res) => {
 
 // DELETE METHODS 
 
-const cart = (req, res) => {
+const deleteCart = async (req, res) => {
     try {
-        res.status(200).json({ state: true, msg: `User cart page is rendered` })
+        const { email, userId, productId } = req.body;
+        const existEmail = await Customer.findOne({ email })
+        if (!existEmail) {
+            return res.status(400).json({
+                state: false,
+                msg: `You cannot Add items in cart. You have not created the account yet. Register your account first`
+            })
+        }
+        else {
+            const deletedItem = await Cart.findOneAndDelete({ email, productId, userId })
+            if (deletedItem) {
+                return res.status(200).json({
+                    state: true,
+                    msg: `cart has been deleted successfully`
+                })
+            }
+            else {
+                return res.status(400).json({
+                    state: false,
+                    msg: `cart item not found`
+                })
+            }
+        }
     }
     catch (error) {
         console.error(`Error : ${error}`)
@@ -422,7 +568,7 @@ const cart = (req, res) => {
 }
 
 
-const wishlist = (req, res) => {
+const deleteWishlist = (req, res) => {
     try {
         res.status(200).json({ state: true, msg: `User wishlist page is rendered` })
     }
@@ -432,9 +578,27 @@ const wishlist = (req, res) => {
 }
 
 
-const review = (req, res) => {
+const deleteReview = async (req, res) => {
     try {
-        res.status(200).json({ state: true, msg: `User review page is rendered` })
+
+        const { email, productId, userId } = req.body;
+
+        const existEmail = await Customer.find({ email })
+        if (!existEmail) {
+            return res.status(400).json({
+                state: false,
+                msg: `You cannot reviw in this product. You have not created the account yet. Register your account first`
+            })
+        }
+        else {
+            const deletedReview = await Review.findOneAndDelete({ productId, userId })
+            if (deletedReview) {
+                return res.status(200).json({ state: true, msg: `Your review has been deleted successfully` })
+            }
+            else {
+                return res.status(400).json({ state: false, msg: `Review not found` })
+            }
+        }
     }
     catch (error) {
         console.error(`Error : ${error}`)
@@ -468,15 +632,16 @@ module.exports = {
     addCart,
     addOrder,
     addReview,
-    addWhishlist,
+    addWishlist,
     allOrders,
     allProducts,
     allReviews,
     allWishlists,
+    allCarts,
     updateProfile,
     updateCart,
     updateReview,
-    cart,
-    wishlist,
-    review
+    deleteCart,
+    deleteWishlist,
+    deleteReview
 }
