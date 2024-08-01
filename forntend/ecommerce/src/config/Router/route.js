@@ -2,20 +2,19 @@ import {BrowserRouter as Router,Routes , Navigate, Route} from "react-router-dom
 import CHome from "../../screens/customer/CHome"
 import CProfile from "../../screens/customer/CProfile"
 import CContact from "../../screens/customer/CContact"
-import { PrivateRoute, PublicRoute } from "./customer/customRoutes"
+import { ProtectedRoutes, PublicRoute } from "./customer/customerRoutes"
+import CLogin from "../../screens/customer/CLogin"
 // import About from "../../screens/About"
 // import Contact from "../../screens/Contact"
 // import { PrivateRoute, PublicRoute } from "./customRoutes"
 // import Login from "../../screens/Login"
 
 
-// const CustomerRouting=()=>{
-
-//     return <Routes>
-//                     <Route index element={<CHome/>}/>
-//                     <Route path="profile" element={<CProfile/>}/>
-//                 </Routes>
-// }
+const CustomerRouting=({path,firstRoute:FirstRoute,secRoute:SecRoute})=>{
+    return <Route  path={path} element={<FirstRoute/>}>
+             <Route exact path={path} element={<SecRoute/>}/>
+           </Route>
+}
 
 const MainRouting=()=>{
 
@@ -23,13 +22,16 @@ const MainRouting=()=>{
                 <Routes>
                     {/* <Route exact path="/" element={<CHome/>}/> */}
                     <Route exact path='/' element={<CHome/>}/>
-                    <Route  path='/profile' element={<PrivateRoute/>}>
+                    <Route  path='/profile' element={<ProtectedRoutes/>}>
                         <Route exact path='/profile' element={<CProfile/>}/>
                     </Route>
+                    <Route  path='/login' element={<PublicRoute/>}>
+                        <Route path='/login' element={<CLogin/>}/>
+                    </Route>
+                    {/* <CustomerRouting path="/profile" firstRoute={PrivateRoute} secRoute={CProfile}/> */}
                         {/* <PrivateRoute path="/contact" component={CContact}/>
                         <PublicRoute path="/home" component={CHome}/> */}
                     {/* </Route> */}
-                    {/* <Route  path='/contact' element={<CContact/>}/> */}
 {/* 
                     </Route> */}
                   {/*   <Route path="/about/:userName" element={<About />}/>

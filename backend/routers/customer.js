@@ -6,6 +6,7 @@ const {verifyAuthToken} = require('../middleware/authVerify')
 
 // GET METHODS 
 router.route('/').get(customerAuthController.home)
+router.route('/verify-user').post(verifyAuthToken);
 router.route('/profile').get(customerAuthController.profile)
 router.route('/all-orders').get(customerAuthController.allOrders)
 router.route('/all-products').get(customerAuthController.allProducts)
