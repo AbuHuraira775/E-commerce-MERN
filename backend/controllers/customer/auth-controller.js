@@ -58,12 +58,19 @@ const allOrders = async (req, res) => {
 
 const allProducts = async (req, res) => {
     try {
-        const allProducts = await Product.find()
-        res.status(200).json({
-            state: true,
-            msg: `User allProducts page is rendered`,
-            data: allProducts
-        })
+        const {email} = req.body;
+        const existEmail = await Customer.find({email})
+        if(existEmail.length>=1){
+            const allProducts = await Product.find()
+            res.status(200).json({
+                state: true,
+                msg: `User allProducts page is rendered`,
+                data: allProducts
+            })
+        }
+        else{
+            return res.status(400).json({state:false, msg: `User Not Found. Register First `})
+        }
     }
     catch (error) {
         console.error(`Error : ${error}`)

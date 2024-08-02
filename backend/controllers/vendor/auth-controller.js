@@ -9,22 +9,44 @@ const Product = require('../../models/product/product-model')
 // GET 
 const profile = async (req, res) => {
     try {
-        res.status(200).json({
-            state: true,
-            msg: `Vendor GET METHOD. profile page is rendered`
-        })
+        const { email } = req.body
+        const existEmail = await Vendor.find({ email })
+
+        if (existEmail.length >= 1) {
+            res.status(200).json({
+                state: true,
+                msg: `Profile Page form the vendor API`,
+                data: existEmail
+            })
+        }
+        else {
+            return res.status(400).json({ state: false, msg: `User not found` })
+        }
     }
     catch (error) {
-        console.error(`API failed due to : ${error}`)
+        console.error(error)
     }
 }
 
 const allProducts = async (req, res) => {
     try {
-        res.status(200).json({
-            state: true,
-            msg: `Vendor GET METHOD. allProducts page is rendered`
-        })
+        const { email, id } = req.body;
+        const existEmail = await Vendor.findOne({ email, _id: id });
+        if (existEmail) {
+            const allProducts = await Product.find()
+            if (allProducts.length == 0) {
+                return res.status(200).json({ state: true, msg: `You have not posted any product yet. First upload post the product` })
+            }
+            res.status(200).json({
+                state: true,
+                msg: `Your all products `,
+                data: allProducts,
+                userData: existEmail
+            })
+        }
+        else {
+            return res.status(400).json({ state: false, msg: `Vendor Not Found. Register First ` })
+        }
     }
     catch (error) {
         console.error(`API failed due to : ${error}`)
@@ -145,6 +167,39 @@ const register = async (req, res) => {
     }
 }
 
+const verifyVendor = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        const existEmail = await Vendor.findOne({ email })
+
+        if (existEmail) {
+            if (otp == existEmail.otp) {
+                if (existEmail.isVerified == true) {
+                    return res.status(400).json({ state: false, msg: `You are verified already and this otp has been expired` })
+                }
+                else {
+                    existEmail.isVerified = true
+
+                    // update MongoDB 
+                    await existEmail.save();
+                    return res.status(200).json({ state: true, msg: `Vendor is verified successfully` })
+                }
+            }
+            else {
+                console.log(existEmail)
+                return res.status(400).json({ state: false, msg: `OTP is not correct` })
+            }
+        }
+        else {
+            return res.status(400).json({ state: false, msg: `Vendor does not exist` })
+        }
+
+    }
+    catch (error) {
+        console.error(error)
+    }
+}
+
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -247,36 +302,44 @@ const changePassword = async (req, res) => {
 
 const addProduct = async (req, res) => {
     try {
-        const { name, description, price, category, dateAdded, email, id } = req.body;
-        const existEmail = await Vendor.findOne({ email })
+        const { id, title, description, price, category, image, vendorEmail } = req.body;
+        const existEmail = await Vendor.findOne({ email: vendorEmail })
         const existProduct = await Product.findOne({ id })
+        const IDregex = /^[a-z]{3,5}-[a-z]{3,5}-\d{3}$/
         const productData = {
             id,
-            name,
+            title,
             description,
             price,
             category,
-            dateAdded
+            image,
+            vendorEmail
         }
         if (existEmail) {
             if (existProduct) {
                 return res.status(400).json({
-                    state:false,
+                    state: false,
                     msg: `Product existed already with id : ${id}`
                 })
             }
             else {
-                await Product.create(productData)
-                res.status(200).json({
-                    state: true,
-                    msg: `VENDOR POST METHOD: Product is added successfully`
-                })
+                if (IDregex.test(id)) {
+
+                    await Product.create(productData)
+                    res.status(200).json({
+                        state: true,
+                        msg: `VENDOR POST METHOD: Product is added successfully`
+                    })
+                }
+                else {
+                    return res.status(400).json({ state: false, msg: `ID is not valid for this product` })
+                }
             }
 
         }
         else {
             return res.status(200).json({
-                state: fasle,
+                state: false,
                 msg: `VENDOR does not existed`
             })
         }
@@ -466,6 +529,7 @@ module.exports = {
     allReviews,
     reviewDetail,
     register,
+    verifyVendor,
     login,
     addProduct,
     addOrder,
