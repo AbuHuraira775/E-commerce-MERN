@@ -7,8 +7,11 @@ const adminRouters = require('./routers/admin')
 const DB_Connection = require('./utils/db')
 const generate_OTP = require('./utils/generate-otp')
 const test = require('./controllers/test')
+var cors = require("cors");
 
 // middleware allow to use json 
+app.use(cors({ origin: true, credentials: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json())
 
 app.use('/api/customer', customerRouters)

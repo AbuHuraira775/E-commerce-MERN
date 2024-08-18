@@ -3,23 +3,12 @@ import { Navigate, Outlet } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from 'react';
 
-
-
-// const PrivateRoute=()=>{
-//     const isLogin = localStorage.getItem("userLogin");
-//     return !isLogin ? <Navigate to="/login" /> : <Outlet />
-// }
-
 const PublicRoute=()=>{
-    const isLogin = localStorage.getItem("userLogin");
-    return isLogin ? <Navigate to="/profile" /> : <Outlet />
+    var token = localStorage.getItem("session_id");
+      var id = localStorage.getItem("uid");
+    return token && id ? <Navigate to="/profile" /> : <Outlet />
 }
 
-// export {PrivateRoute,PublicRoute}
-
-
-
-//now useAuth is not a function anymore is a hook (leaves in the component lifecycle).
 const useAuth = () => { 
   const [isAuth, setIsAuth] = useState(null);
 
@@ -30,7 +19,7 @@ const useAuth = () => {
       var url = "http://localhost:5000/api/customer/verify-user";
 
       if(!token || !id) setIsAuth(false);
-
+      else{
       try { 
         const res = await axios.post(url, {token,id,apiType:"route"})
         console.log(res);    
@@ -47,9 +36,10 @@ const useAuth = () => {
       catch(e) {
         console.log(e);
         setIsAuth(false);
+        localStorage.clear();  
       }
     };          
-
+}
    
    fetchData();
  }, []);      
@@ -60,7 +50,7 @@ const useAuth = () => {
 
 const ProtectedRoutes = () => {
   const isAuth = useAuth();
-
+    console.log("isAuth",isAuth)
   if (isAuth === null) // waiting..
     return null;
 

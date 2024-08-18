@@ -20,7 +20,6 @@ const MainRouting=()=>{
 
     return <Router>
                 <Routes>
-                    {/* <Route exact path="/" element={<CHome/>}/> */}
                     <Route exact path='/' element={<CHome/>}/>
                     <Route  path='/profile' element={<ProtectedRoutes/>}>
                         <Route exact path='/profile' element={<CProfile/>}/>
@@ -28,18 +27,6 @@ const MainRouting=()=>{
                     <Route  path='/login' element={<PublicRoute/>}>
                         <Route path='/login' element={<CLogin/>}/>
                     </Route>
-                    {/* <CustomerRouting path="/profile" firstRoute={PrivateRoute} secRoute={CProfile}/> */}
-                        {/* <PrivateRoute path="/contact" component={CContact}/>
-                        <PublicRoute path="/home" component={CHome}/> */}
-                    {/* </Route> */}
-{/* 
-                    </Route> */}
-                  {/*   <Route path="/about/:userName" element={<About />}/>
-                        <Route  path='/contact' element={<Contact/>}/>
-                    </Route>
-                    <Route  path='/login' element={<PublicRoute/>}>
-                        <Route  path='/login' element={<Login/>}/>
-                    </Route> */}
                 </Routes>
     </Router>
 }
