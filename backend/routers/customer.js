@@ -31,7 +31,6 @@ router.route('/update-review').put(customerAuthController.updateReview) //done
 
 // DELETE METHODS
 router.route('/delete-cart').delete(customerAuthController.deleteCart) //done
-router.route('/delete-wishlist').delete(customerAuthController.deleteWishlist)
 router.route('/delete-review').delete(customerAuthController.deleteReview) //done
 
 // check all user 

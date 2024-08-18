@@ -355,7 +355,7 @@ const addCart = async (req, res) => {
 
 const addOrder = async (req, res) => {
     try {
-        const { email, userId, productId, shippingAddress, orderDate, quantity } = req.body;
+        const { email, userId, productId, shippingAddress, orderDate, quantity,sellerEmail } = req.body;
 
         const existEmail = await Customer.findOne({ email })
         if (!existEmail) {
@@ -364,8 +364,14 @@ const addOrder = async (req, res) => {
                 msg: `User Does not existed please login first`
             })
         }
+        else if(email == sellerEmail){
+            return res.status(400).json({
+                state: false,
+                msg: `You cannot order yourself`
+            })
+        }
         else {
-            const newOrder = { quantity, shippingAddress, orderDate, email, userId, productId }
+            const newOrder = { quantity, shippingAddress, orderDate, userId, productId,sellerEmail }
             await Order.create(newOrder)
             return res.status(200).json({
                 state: true,
@@ -382,7 +388,7 @@ const addOrder = async (req, res) => {
 const addReview = async (req, res) => {
     try {
 
-        const { email, productId, userId, content, date, rating } = req.body;
+        const { email, productId, userId, content, date, rating,sellerEmail } = req.body;
 
         const existEmail = await Customer.find({ email })
         if (!existEmail) {
@@ -391,8 +397,14 @@ const addReview = async (req, res) => {
                 msg: `You cannot reviw in this product. You have not created the account yet. Register your account first`
             })
         }
+        else if(email == sellerEmail){
+            return res.status(400).json({
+                state: false,
+                msg: `You cannot reviw yourself`
+            })   
+        }
         else {
-            await Review.create({ email, productId, userId, content, date, rating })
+            await Review.create({ email, productId, userId, content, date, rating,sellerEmail })
             return res.status(200).json({
                 state: true,
                 msg: `Your review has been added successfully`
@@ -400,7 +412,7 @@ const addReview = async (req, res) => {
         }
     }
     catch (error) {
-        console.error(error)
+        console.error('Error : ',error)
     }
 }
 
@@ -574,17 +586,6 @@ const deleteCart = async (req, res) => {
     }
 }
 
-
-const deleteWishlist = (req, res) => {
-    try {
-        res.status(200).json({ state: true, msg: `User wishlist page is rendered` })
-    }
-    catch (error) {
-        console.error(`Error : ${error}`)
-    }
-}
-
-
 const deleteReview = async (req, res) => {
     try {
 
@@ -649,6 +650,5 @@ module.exports = {
     updateCart,
     updateReview,
     deleteCart,
-    deleteWishlist,
     deleteReview
 }
