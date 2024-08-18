@@ -43,7 +43,8 @@ router.route('/order/:id').put(adminAuthController.updateOrder)
 router.route('/review/:id').put(adminAuthController.updateReview)
 
 // DELETE METHODS 
-router.route('/user/:id').delete(adminAuthController.deleteUser) //done
+router.route('/user/:id').delete(adminAuthController.deleteUser) //done  
+
 router.route('/vendor/:id').delete(adminAuthController.deleteVendor) //done
 router.route('/product/:id').delete(adminAuthController.deleteProduct) //done
 router.route('/order/:id').delete(adminAuthController.deleteOrder) //done
