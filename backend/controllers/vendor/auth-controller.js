@@ -5,26 +5,51 @@ const comaprePassword = require('../../utils/comapre-password')
 const generate_OPT = require('../../utils/generate-otp')
 const sendEmail = require('../../utils/send-mail')
 const Product = require('../../models/product/product-model')
+const Order = require('../../models/order/order-model')
+const Review = require('../../models/review/review-model')
 
 // GET 
 const profile = async (req, res) => {
     try {
-        res.status(200).json({
-            state: true,
-            msg: `Vendor GET METHOD. profile page is rendered`
-        })
+        const { email } = req.body
+        const existEmail = await Vendor.find({ email })
+
+        if (existEmail.length >= 1) {
+            res.status(200).json({
+                state: true,
+                msg: `Profile Page form the vendor API`,
+                data: existEmail
+            })
+        }
+        else {
+            return res.status(400).json({ state: false, msg: `User not found` })
+        }
     }
     catch (error) {
-        console.error(`API failed due to : ${error}`)
+        console.error(error)
     }
 }
 
 const allProducts = async (req, res) => {
     try {
-        res.status(200).json({
-            state: true,
-            msg: `Vendor GET METHOD. allProducts page is rendered`
-        })
+        const { email } = req.body;
+        const id = req.params.id
+        const existEmail = await Vendor.findOne({ email, _id: id })
+        if (existEmail) {
+            const allProducts = await Product.findOne({ email })
+            console.log(allProducts, id)
+            if (allProducts.length == 0) {
+                return res.status(200).json({ state: true, msg: `You have not posted any product yet. First upload the product` })
+            }
+            res.status(200).json({
+                state: true,
+                msg: `Your all products `,
+                data: allProducts
+            })
+        }
+        else {
+            return res.status(400).json({ state: false, msg: `Vendor Not Found. Register First ` })
+        }
     }
     catch (error) {
         console.error(`API failed due to : ${error}`)
@@ -33,10 +58,21 @@ const allProducts = async (req, res) => {
 
 const productDetail = async (req, res) => {
     try {
-        res.status(200).json({
-            state: true,
-            msg: `Vendor GET METHOD. productDetail page is rendered`
-        })
+        const { email } = req.body;
+        const productId = req.params.id
+        const existEmail = await Vendor.findOne({ email })
+        const existProduct = await Product.findById({ _id: productId })
+        if (existEmail) {
+            if (existProduct) {
+                return res.status(400).json({ state: true, msg: `Product rendered successfully`, data: existProduct })
+            }
+            else {
+                return res.status(400).json({ state: false, msg: `Product does not exist with this id ${productId}` })
+            }
+        }
+        else {
+            return res.status(400).json({ state: false, msg: `User Not Found. Kindly register your account first` })
+        }
     }
     catch (error) {
         console.error(`API failed due to : ${error}`)
@@ -45,10 +81,26 @@ const productDetail = async (req, res) => {
 
 const allOrders = async (req, res) => {
     try {
-        res.status(200).json({
-            state: true,
-            msg: `Vendor GET METHOD. allOrders page is rendered`
-        })
+        const { email } = req.body;
+        const id = req.params.id
+        const existEmail = await Vendor.findOne({ email, _id: id })
+        console.log('email: ', email)
+        console.log('id: ', id)
+        if (existEmail) {
+            const allOrders = await Order.find({ sellerEmail: email })
+            console.log(allOrders, id)
+            if (allOrders.length == 0) {
+                return res.status(200).json({ state: true, msg: `You have not recieved any order yet.` })
+            }
+            res.status(200).json({
+                state: true,
+                msg: `Your Orders `,
+                data: allOrders
+            })
+        }
+        else {
+            return res.status(400).json({ state: false, msg: `Vendor Not Found. Register First ` })
+        }
     }
     catch (error) {
         console.error(`API failed due to : ${error}`)
@@ -57,10 +109,21 @@ const allOrders = async (req, res) => {
 
 const orderDetail = async (req, res) => {
     try {
-        res.status(200).json({
-            state: true,
-            msg: `Vendor GET METHOD. orderDetail page is rendered`
-        })
+        const { email } = req.body;
+        const orderId = req.params.id
+        const existEmail = await Vendor.findOne({ email })
+        const existOrder = await Order.findById({ _id: orderId })
+        if (existEmail) {
+            if (existOrder) {
+                return res.status(200).json({ state: true, msg: `Order rendered successfully`, data: existOrder })
+            }
+            else {
+                return res.status(400).json({ state: false, msg: `Order does not exist with this id ${orderId}` })
+            }
+        }
+        else {
+            return res.status(400).json({ state: false, msg: `User Not Found. Kindly register your account first` })
+        }
     }
     catch (error) {
         console.error(`API failed due to : ${error}`)
@@ -69,10 +132,24 @@ const orderDetail = async (req, res) => {
 
 const allReviews = async (req, res) => {
     try {
-        res.status(200).json({
-            state: true,
-            msg: `Vendor GET METHOD. allReviews page is rendered`
-        })
+        const { email } = req.body;
+        const id = req.params.id
+        const existEmail = await Vendor.findOne({ email, _id: id })
+        if (existEmail) {
+            const allReview = await Review.find({ sellerEmail: email })
+            console.log(allReview, id)
+            if (allReview.length == 0) {
+                return res.status(200).json({ state: true, msg: `Your product has no review yet.` })
+            }
+            res.status(200).json({
+                state: true,
+                msg: `Your Reviews `,
+                data: allReview
+            })
+        }
+        else {
+            return res.status(400).json({ state: false, msg: `Vendor Not Found. Register First ` })
+        }
     }
     catch (error) {
         console.error(`API failed due to : ${error}`)
@@ -81,10 +158,21 @@ const allReviews = async (req, res) => {
 
 const reviewDetail = async (req, res) => {
     try {
-        res.status(200).json({
-            state: true,
-            msg: `Vendor GET METHOD. reviewDetail page is rendered`
-        })
+        const { email } = req.body;
+        const reviewId = req.params.id
+        const existEmail = await Vendor.findOne({ email })
+        const existReview = await Review.findById({ _id: reviewId })
+        if (existEmail) {
+            if (existReview) {
+                return res.status(200).json({ state: true, msg: `Review rendered successfully`, data: existReview })
+            }
+            else {
+                return res.status(400).json({ state: false, msg: `Review does not exist with this id ${reviewId}` })
+            }
+        }
+        else {
+            return res.status(400).json({ state: false, msg: `User Not Found. Kindly register your account first` })
+        }
     }
     catch (error) {
         console.error(`API failed due to : ${error}`)
@@ -142,6 +230,39 @@ const register = async (req, res) => {
     }
     catch (error) {
         console.error(`Error : ${error}`)
+    }
+}
+
+const verifyVendor = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        const existEmail = await Vendor.findOne({ email })
+
+        if (existEmail) {
+            if (otp == existEmail.otp) {
+                if (existEmail.isVerified == true) {
+                    return res.status(400).json({ state: false, msg: `You are verified already and this otp has been expired` })
+                }
+                else {
+                    existEmail.isVerified = true
+
+                    // update MongoDB 
+                    await existEmail.save();
+                    return res.status(200).json({ state: true, msg: `Vendor is verified successfully` })
+                }
+            }
+            else {
+                console.log(existEmail)
+                return res.status(400).json({ state: false, msg: `OTP is not correct` })
+            }
+        }
+        else {
+            return res.status(400).json({ state: false, msg: `Vendor does not exist` })
+        }
+
+    }
+    catch (error) {
+        console.error(error)
     }
 }
 
@@ -247,36 +368,44 @@ const changePassword = async (req, res) => {
 
 const addProduct = async (req, res) => {
     try {
-        const { name, description, price, category, dateAdded, email, id } = req.body;
+        const { id, title, description, price, category, image, email } = req.body;
         const existEmail = await Vendor.findOne({ email })
-        const existProduct = await Product.findOne({ id })
-        const productData = {
-            id,
-            name,
-            description,
-            price,
-            category,
-            dateAdded
-        }
+        const existProduct = await Product.findOne({ email, id })
+        const IDregex = /^[a-z]{3,5}-[a-z]{3,5}-\d{3}$/
+        const productData = { id, title, description, price, category, image, email }
         if (existEmail) {
-            if (existProduct) {
-                return res.status(400).json({
-                    state:false,
-                    msg: `Product existed already with id : ${id}`
-                })
+            const isVerified = await existEmail.isVerified
+            if (isVerified == false) {
+                return res.status(400).json({ state: false, msg: `You are not verified. Verify Your account first than upload the product` })
             }
             else {
-                await Product.create(productData)
-                res.status(200).json({
-                    state: true,
-                    msg: `VENDOR POST METHOD: Product is added successfully`
-                })
+
+                if (existProduct) {
+                    return res.status(400).json({
+                        state: false,
+                        msg: `Product existed already with id : ${id}`
+                    })
+                }
+                else {
+                    if (IDregex.test(id)) {
+
+                        await Product.create(productData)
+                        res.status(200).json({
+                            state: true,
+                            msg: `Product is added successfully`,
+                            data: productData
+                        })
+                    }
+                    else {
+                        return res.status(400).json({ state: false, msg: `ID is not valid for this product` })
+                    }
+                }
             }
 
         }
         else {
             return res.status(200).json({
-                state: fasle,
+                state: false,
                 msg: `VENDOR does not existed`
             })
         }
@@ -288,39 +417,69 @@ const addProduct = async (req, res) => {
 }
 
 const addOrder = async (req, res) => {
+
     try {
-        res.status(200).json({
-            state: true,
-            msg: `VENDOR POST METHOD: addOrder page is rendered`
-        })
+        const { email, vendorId, productId, shippingAddress, orderDate, quantity, sellerEmail } = req.body;
+
+        const existEmail = await Vendor.findOne({ email })
+        if (!existEmail) {
+            return res.status(400).json({
+                state: false,
+                msg: `Email Does not existed please register first`
+            })
+        }
+        else if (email == sellerEmail) {
+            return res.status(400).json({
+                state: false,
+                msg: `You cannot order yourself`
+            })
+        }
+        else {
+            const newOrder = { email, quantity, shippingAddress, orderDate, vendorId, productId, sellerEmail }
+            await Order.create(newOrder)
+            return res.status(200).json({
+                state: true,
+                msg: `Order has been created successfully`
+            })
+        }
     }
     catch (error) {
-        console.error(`API failed due to : ${error}`)
+        console.error(`Error : ${error}`)
     }
 }
 
 const addReview = async (req, res) => {
     try {
-        res.status(200).json({
-            state: true,
-            msg: `VENDOR POST METHOD: addReview page is rendered`
-        })
+
+        const { email, productId, vendorId, content, date, rating, sellerEmail } = req.body;
+
+        const existEmail = await Vendor.find({ email })
+        if (!existEmail) {
+            return res.status(400).json({
+                state: false,
+                msg: `You cannot reviw in this product. You have not created the account yet. Register your account first`
+            })
+        }
+        else if (email == sellerEmail) {
+            return res.status(400).json({
+                state: false,
+                msg: `You cannot reviw yourself`
+            })
+        }
+        else {
+            await Review.create({ email, productId, vendorId, content, date, rating, sellerEmail })
+            return res.status(200).json({
+                state: true,
+                msg: `Your reviewed this product successfully`
+            })
+        }
     }
     catch (error) {
-        console.error(`API failed due to : ${error}`)
+        console.error('Error : ', error)
     }
 }
 
 const addShopDetail = async (req, res) => {
-    try {
-        res.status(200).json({
-            state: true,
-            msg: `VENDOR POST METHOD: addShopDetail page is rendered`
-        })
-    }
-    catch (error) {
-        console.error(`API failed due to : ${error}`)
-    }
 }
 
 // PUT 
@@ -374,10 +533,21 @@ const editreview = async (req, res) => {
 
 const editShopDetail = async (req, res) => {
     try {
-        res.status(200).json({
-            state: true,
-            msg: `VENDOR PUT METHOD: editShopDetail page is rendered`
-        })
+        const { email, vendorId, newShopName, newShopAddress } = req.body;
+        const existEmail = await Vendor.findOne({ email, _id: vendorId })
+        if (!existEmail) {
+            return res.status(400).json({ state: false, msg: `Vendor does exist, register your account first` })
+        }
+        else {
+            if (!newShopName.trim() == '' && !newShopAddress.trim() == '') {
+                await existEmail.updateOne({
+                    shopeName: newShopName,
+                    shopeAddress: newShopAddress
+                })
+                return res.status(200).json({ state: true, msg: `Shop detils has been updated successfully` })
+
+            }
+        }
     }
     catch (error) {
         console.error(`API failed due to : ${error}`)
@@ -466,6 +636,7 @@ module.exports = {
     allReviews,
     reviewDetail,
     register,
+    verifyVendor,
     login,
     addProduct,
     addOrder,

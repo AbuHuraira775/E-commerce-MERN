@@ -21,13 +21,17 @@ const orderSchema = new mongoose.Schema({
         required: true
     },
     shippingAddress: {
-        type: Object,
+        type: Object, 
         properties: {
             street: "String",
             state: "String",
             city: "String"
         }
     },
+    sellerEmail:{
+        type: String,
+        required: true
+    }
 },
     { timestamps: true }
 

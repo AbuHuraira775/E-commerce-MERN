@@ -3,13 +3,21 @@ const mongoose = require('mongoose')
 const productSchema = new mongoose.Schema({
     id: {
         type: String,
-        required: true
+        required: true // provide by the vendor
     },
-    name: {
+    email: {
+        type: String,
+        required: true 
+    },
+    title: {
         type: String,
         required: true
     },
     description: {
+        type: String,
+        required: true
+    },
+    image: {
         type: String,
         required: true
     },
@@ -20,13 +28,10 @@ const productSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true
-    },
-    dateAdded: {
-        type: Date,
-        default: Date.now(),
-        required: true
     }
-})
+},
+    { timestamps: true }
+)
 
 const Product = new mongoose.model('Product', productSchema)
 module.exports = Product

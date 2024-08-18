@@ -5,7 +5,7 @@ const verifyToken = require('../utils/verify-token')
 const { verifyAuthToken } = require('../middleware/authVerify')
 
 // GET METHODS 
-router.route('/').get(customerAuthController.home) //done
+router.route('/').get(customerAuthController.home) //done 
 router.route('/profile').get(customerAuthController.profile)  //done
 router.route('/all-orders').get(customerAuthController.allOrders)  //done
 router.route('/all-products').get(customerAuthController.allProducts)  //done
@@ -31,8 +31,7 @@ router.route('/update-review').put(customerAuthController.updateReview) //done
 
 // DELETE METHODS
 router.route('/delete-cart').delete(customerAuthController.deleteCart) //done
-router.route('/delete-wishlist').delete(customerAuthController.deleteWishlist)
-router.route('/delete-review').delete(customerAuthController.deleteReview) //domne
+router.route('/delete-review').delete(customerAuthController.deleteReview) //done
 
 // check all user 
 router.route('/all-users').get(customerAuthController.getAllUsers)
