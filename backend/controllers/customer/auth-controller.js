@@ -209,6 +209,7 @@ const verifyAccount = async (req, res) => {
 
 const login = async (req, res) => {
     try {
+        console.log("req.body", req);
         const { email, password } = req.body;
         const loginData = { email, password }
         // check user has the acoount?
